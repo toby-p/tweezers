@@ -34,7 +34,7 @@ This list of stripped down tweets is also accessible by the <code>.stripped_twee
 
 <img src = "./images/stripped_tweets_method.PNG">
 
-#### The search object features a number of other methods for accessing data ...
+#### The search object features a number of other methods and attributes for accessing data ...
 
 <img src = "./images/search.methods.PNG">
 
@@ -42,9 +42,13 @@ This list of stripped down tweets is also accessible by the <code>.stripped_twee
 
 <img src = "./images/users_df_method.PNG">
 
-### <i>Tweezers</i> is in the early stages of development - contributions are welcome!
+### <i>Tweezers</i> is in the early stages of development
+#### There might be bugs! Contributions are welcome.
+It has been written in Python 3.6.1, using <i>virtualenv</i> to minimise dependency issues - it is untested in Python 2.x
+
 When it is in reasonable shape it will be packaged up on pypi for installation via <code>pip</code>
+
 Current plan for future iterations include:
-* Incorporating Natural Language Processing (e.g. using <i>spacy</i>) into the module for instant sentiment analysis.
+* Incorporating Natural Language Processing (e.g. using <i>spacy</i>) in the module for instant sentiment analysis.
 * Building a separate <code>stream</code> class to work with the Twitter stream API.
-* Creating a <code>.summary()</code> method to provide key statistics for the search results - similar to the Pandas <code>.describe()</code> method.
+* Creating a <code>.summary()</code> method to generate key statistics for the search results - similar to the Pandas <code>.describe()</code> method.
