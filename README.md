@@ -41,7 +41,7 @@ An average of both scores for the tweets returned by the search can also be acce
 ```python
 my_search.polarity_score
 ```
-<img src = "./images/sentiment_score.PNG">
+<img src = "./images/sentiment_scores.PNG">
 
 #### The search object features a number of other methods and attributes for accessing data ...
 
