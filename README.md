@@ -39,7 +39,7 @@ The sentiment scores are given in terms of <i>polarity</i> (how positive or nega
 
 An average of both scores for the tweets returned by the search can also be accessed as attributes:
 
-<img src = "./images/sentiment_scores.PNG" height="100">
+<img src = "./images/sentiment_scores.PNG" height="125">
 
 #### The search object features a number of other methods and attributes for accessing data ...
 
