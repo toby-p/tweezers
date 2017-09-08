@@ -9,6 +9,8 @@ import re
 import datetime
 from math import nan
 import pandas as pd
+from textblob import TextBlob # For sentiment analysis
+from numpy import mean
 
 class tweezer_auth(object):
     """Primary object for authenticating a twitter API instance ."""
@@ -62,6 +64,14 @@ class search(object):
           multiple search words will be searched as one phrase, and will only be returned in the
           results if all words are found in the given order in a tweet.
         * include_RTs: whether to include retweets in the search results (default False).
+        
+        Attributes:
+            polarity_score          Float between -1.0 and 1.0 which represents the average 
+                                    sentiment of the tweets returned by the search.
+            subjectivity_score      Float between 0.0 and 1.0 representing the average objectivity
+                                    of the tweets returned by the search, where 0 is very 
+                                    objective and 1 is very subjective.
+            
         """
 
     def __init__(self, tweezer_auth, search_term, \
@@ -96,6 +106,9 @@ class search(object):
         self.urls = []  # URLs contained in each tweet.
         self.ats = []  # Users mentioned in each tweet.
         self.hashtags = [] # Hashtags used in each tweet.
+        self.polarity = [] # Sentiment analysis of tweet polarity
+        self.subjectivity = [] # Sentiment analysis of tweet subjectivity
+        
         
         # This loop will iterate through twitter searches, using a new max_id
         # value each iteration to collect the set of next oldest tweets. The loop 
@@ -162,14 +175,20 @@ class search(object):
         
         print("%s tweets requested, %s tweets returned" % (self.total, self.result_count))
         
-        # Add URLs, ats from each tweet to the variables.
+        # Add features from each tweet to the variables.
         for tweet in range(self.result_count):
             tweet = self.results_json[tweet]['text']
             self.tweets.append(tweet)
-            self.stripped_tweets.append(self.__stripped_tweet(tweet))
+            tweet_stripped = self.__stripped_tweet(tweet)
+            self.stripped_tweets.append(tweet_stripped)
             self.urls.append(self.__strip_urls(tweet)[0])
             self.ats.append(self.__strip_ats(tweet)[0])
             self.hashtags.append(self.__strip_hashtags(tweet)[0])
+            
+            # Sentiment analysis
+            tweet_blob = TextBlob(tweet_stripped)
+            self.polarity.append(tweet_blob.sentiment.polarity)
+            self.subjectivity.append(tweet_blob.sentiment.subjectivity)
         
         # Create .users variable with list of users who authored each tweet in the results.
         self.__parse_users()
@@ -178,7 +197,6 @@ class search(object):
         self.retweet_count = self.list_tweet_feature(feature = "retweet_count")
         self.favorite_count = self.list_tweet_feature(feature = "favorite_count")
         
-    
         # Add the .time_per_tweet and .tweets_per_week variables.
         self.__time_per_tweet()
         self.__tweets_per_week()
@@ -187,9 +205,13 @@ class search(object):
         self.tweet_features = list(self.results_json[0].keys())
         self.entities = list(self.results_json[0]['entities'].keys())
         self.user_features = list(self.results_json[0]['user'].keys())
+        
+        # Create the sentiment analysis scores
+        self.__polarity_score()
+        self.__subjectivity_score()
     
     def __str__(self):
-        return """Twitter search instance created with attributes:
+        return """Twitter search instance created with arguments:
         \t search_term = %s
         \t total = %s""" % (self.search_term, str(self.total))
     
@@ -324,9 +346,10 @@ class search(object):
         stripped_tweet = stripped_tweet.replace("@", "")
         return self.__strip_urls(stripped_tweet)[2]
     
-    def pandas_df(self):
+    def pandas_df(self, sentiments = False):
         """Function to generate a full Pandas dataframe containing the tweets
-        and their component parts for analysis."""
+        and their component parts for analysis.
+        """
         pandas_df = pd.DataFrame({"tweet":self.tweets,
                                  "stripped_tweet":self.stripped_tweets,
                                  "id":self.ids,
@@ -336,7 +359,10 @@ class search(object):
                                  "created_at":self.create_dates,
                                  "user":self.users,
                                  "favorite_count":self.favorite_count,
-                                 "retweet_count":self.retweet_count})
+                                 "retweet_count":self.retweet_count,
+                                 "subjectivity":self.subjectivity,
+                                 "polarity":self.polarity})
+        
         return pandas_df
     
     def __list_of_lists_to_df(self, thing, list_of_lists, return_type):
@@ -410,3 +436,10 @@ class search(object):
         return self.__list_of_lists_to_df(thing = "hashtags", 
                                           list_of_lists = [self.hashtags], 
                                           return_type = return_type)
+    
+    # Sentiment analysis
+    def __polarity_score(self):
+        self.polarity_score = mean(self.polarity)
+    
+    def __subjectivity_score(self):
+        self.subjectivity_score = mean(self.subjectivity)
