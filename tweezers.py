@@ -109,7 +109,6 @@ class search(object):
         self.polarity = [] # Sentiment analysis of tweet polarity
         self.subjectivity = [] # Sentiment analysis of tweet subjectivity
         
-        
         # This loop will iterate through twitter searches, using a new max_id
         # value each iteration to collect the set of next oldest tweets. The loop 
         # will continue until the number of results collected exceeds the 
@@ -192,6 +191,9 @@ class search(object):
         
         # Create .users variable with list of users who authored each tweet in the results.
         self.__parse_users()
+        
+        # Create .coordinates variable with list of geographic coordinates of each tweet.
+        self.__parse_geo()
         
         # Create .variables with lists of key features from the tweets.
         self.retweet_count = self.list_tweet_feature(feature = "retweet_count")
@@ -361,7 +363,8 @@ class search(object):
                                  "favorite_count":self.favorite_count,
                                  "retweet_count":self.retweet_count,
                                  "subjectivity":self.subjectivity,
-                                 "polarity":self.polarity})
+                                 "polarity":self.polarity,
+                                 "coordinates":self.coordinates})
         
         return pandas_df
     
@@ -443,3 +446,15 @@ class search(object):
     
     def __subjectivity_score(self):
         self.subjectivity_score = mean(self.subjectivity)
+        
+    # Geographic data
+    def __parse_geo(self):
+        """Creates a variable .coordinates which returns a list of the geographic coordinates of
+        each tweet if found."""
+        geo = [self.results_json[status]["geo"] for status in range(len(self.results_json))]
+        self.coordinates = []
+        for tweet in geo:
+            if tweet != None:
+                self.coordinates.append(tweet["coordinates"])
+            else:
+                self.coordinates.append([None, None])
