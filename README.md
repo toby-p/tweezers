@@ -34,6 +34,13 @@ This list of stripped down tweets is also accessible by the <code>.stripped_twee
 
 <img src = "./images/stripped_tweets_method.PNG">
 
+#### NEW! The dataframe now includes sentiment analysis scores for each tweet
+The sentiment scores are given in terms of <i>polarity</i> (how positive or negative the content is, from a scale of 1.0 to -1.0) and <i>subjectivity</i> (how objective or subjective the opinions are, on a scale of 0.0 to 1.0).
+
+An average of both scores for the tweets returned by the search can also be accessed as attributes:
+
+<img src = "./images/sentiment_scores.PNG" height="125">
+
 #### The search object features a number of other methods and attributes for accessing data ...
 
 <img src = "./images/search.methods.PNG">
