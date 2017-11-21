@@ -56,6 +56,5 @@ It has been written in Python 3.6.1, using <i>virtualenv</i> to minimise depende
 When it is in reasonable shape it will be packaged up on pypi for installation via <code>pip</code>
 
 Current plan for future iterations include:
-* Incorporating Natural Language Processing (e.g. using <i>spacy</i>) in the module for instant sentiment analysis.
 * Building a separate <code>stream</code> class to work with the Twitter stream API.
 * Creating a <code>.summary()</code> method to generate key statistics for the search results - similar to the Pandas <code>.describe()</code> method.
