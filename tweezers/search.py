@@ -1,5 +1,4 @@
 
-import datetime
 from math import nan
 import pandas as pd
 import re
@@ -42,7 +41,7 @@ def strip_regex(tweet, regex):
         stripped_tweet = stripped_tweet.replace(text, "")
 
     # Remove any double spaces left behind from text stripping:
-    stripped_tweet = re.sub("\s+", "  ", stripped_tweet).strip()
+    stripped_tweet = re.sub(" +", " ", stripped_tweet).strip()
 
     return matches, match_count, stripped_tweet
 
@@ -137,22 +136,21 @@ class TweezerSearch:
             elif not len(results.json()["statuses"]):
                 break
 
-        # Trim the results to the count limit:
+        # Trim the results to the count limit and save results as a DataFrame:
         if self.result_count > self.total:
             self.results_json = self.results_json[:total]
             self.result_count = self.total
             self.ids = self.ids[:total]
+        self.results_df = self._clean_results(pd.DataFrame(self.results_json))
+        print(f"{self.total:,} tweets requested; {self.result_count:,} tweets returned")
 
-        print(f"{self.total:,} tweets requested, {self.result_count:,} tweets returned")
-        self.df = self.clean_results(pd.DataFrame(self.results_json))
-
-        # Generate lists of the available features in the tweets.
+        # Generate lists of the available features in the tweets:
         self.tweet_features = list(self.results_json[0].keys())
         self.entities = list(self.results_json[0]["entities"].keys())
         self.user_features = list(self.results_json[0]["user"].keys())
 
     @staticmethod
-    def clean_results(df: pd.DataFrame):
+    def _clean_results(df: pd.DataFrame):
         df = df.copy()
         df["user"] = [u["screen_name"] for u in df["user"]]
         df["tweet"] = df["text"]
@@ -192,18 +190,19 @@ class TweezerSearch:
             url += f"&max_id={next_max_id}"
         return url
 
+    @property
     def time_per_tweet(self):
         """Average amount of time elapsing between each tweet in the results."""
         if not self.result_count:
-            self.time_per_tweet = nan
-        oldest, newest = min(self.df["created_at"]), max(self.df["created_at"])
+            return nan
+        oldest, newest = min(self.results_df["created_at"]), max(self.results_df["created_at"])
         difference = newest - oldest
         return difference / self.result_count
 
+    @property
     def tweets_per_week(self):
         """Rough estimate of the number of tweets about the search term per
         week."""
-        tweets_per_week = nan
         time_per_tweet = self.time_per_tweet
         days_in_seconds = time_per_tweet.days * 24 * 60 * 60
         seconds = time_per_tweet.seconds
@@ -214,6 +213,8 @@ class TweezerSearch:
             tweets_per_week = int(seconds_in_week / total_seconds)
         elif time_per_tweet.microseconds > 0:
             tweets_per_week = int(microseconds_in_week / time_per_tweet.microseconds)
+        else:
+            tweets_per_week = 0
         return tweets_per_week
 
     def count_list_col_values(self, col: str):
@@ -224,15 +225,11 @@ class TweezerSearch:
                 `urls`, `hashtags`, `ats`.
         """
         assert col in ("urls", "hashtags", "ats"), f"Invalid column name: {col}"
-        all_values = [i for l in self.df[col] for i in l]
+        all_values = [i for l in self.results_df[col] for i in l]
         return pd.Series(all_values).value_counts()
 
     def __str__(self):
-        return f"TweezerSearch instance created with arguments:"\
-            f"\n\tsearch_term = {self.search_term}"\
-            f"\n\ttotal = {self.total:,}"
+        return f"TweezerSearch: `{self.search_term}` ({self.result_count} total)"
 
     def __repr__(self):
-        return f"TweezerSearch instance created with arguments:"\
-            f"\n\tsearch_term = {self.search_term}"\
-            f"\n\ttotal = {self.total:,}"
+        return f"TweezerSearch: `{self.search_term}` ({self.result_count} total)"

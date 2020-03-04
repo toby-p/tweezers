@@ -13,7 +13,11 @@ class Tweezers:
             https://developer.twitter.com/en/apps/
         """
         self.__auth = TweezerAuth(api_key, api_secret_key, access_token, access_token_secret)
+        self.status_code = self.get_status()
         self.search_history = list()
+
+    def get_status(self):
+        return self.__auth.get_status()
 
     def search(self, search_term: str, language: str = "en", total: int = 100,
                result_type: str = "recent", search_type: str = "words",
@@ -41,3 +45,9 @@ class Tweezers:
                           include_rts=include_rts)
         self.search_history.append(s)
         return s
+
+    def __str__(self):
+        return f"Tweezers instance with status code {self.status_code}"
+
+    def __repr__(self):
+        return f"Tweezers instance with status code {self.status_code}"
