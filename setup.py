@@ -16,14 +16,14 @@ with open(os.path.join(DIR, "requirements.txt"), "r") as f:
 setup(
     name="tweezers",
     packages=["tweezers"],
-    version="0.0.1",
+    version="0.0.2",
     description="A lightweight library for scraping Twitter data.",
     long_description=long_description,
     author="Toby Petty",
-    author_email="tobypetty@hotmail.com",
+    author_email="toby.b.petty@gmail.com",
     url="https://github.com/toby-p/tweezers",
     install_requires=REQUIRED,
-    python_requires='>=3.6',
+    python_requires='>=3.9',
     keywords=["api", "twitter", "data"],
     license="MIT",
     classifiers=[

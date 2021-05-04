@@ -9,15 +9,18 @@ from tweezers import Tweezers
 # Loading Twitter auth credentials from a local JSON file. Get yours here:
 # https://developer.twitter.com/en/apps/
 import json
+import os
+
 fp = os.path.join(os.getcwd(), "credentials.json")
 with open(fp) as f:
     credentials = json.load(f)
 
-t = Tweezers(api_key=credentials["api_key"], 
-             api_secret_key=credentials["api_secret_key"], 
-             access_token=credentials["access_token"], 
-             access_token_secret=credentials["access_token_secret"]
-            )
+t = Tweezers(
+    api_key=credentials["api_key"], 
+    api_secret_key=credentials["api_secret_key"], 
+    access_token=credentials["access_token"], 
+    access_token_secret=credentials["access_token_secret"]
+)
 ```
 #### Perform a search
 Searching returns an instance of a class `TweezerSearch`, which contains various data attributes returned by the Twitter API:
