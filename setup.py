@@ -19,6 +19,7 @@ setup(
     version="0.0.2",
     description="A lightweight library for scraping Twitter data.",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Toby Petty",
     author_email="toby.b.petty@gmail.com",
     url="https://github.com/toby-p/tweezers",
